@@ -4,7 +4,7 @@
  ' "cscript updateStatusDir.vbs <url АС портала> <папка для хранения документов> <тип документа>"
   
   dim oFSO
- ' dim EVatService
+  dim EVatService
   dim EDocStatus
   dim res
   dim FolderName
@@ -76,55 +76,55 @@
   
   sgnPattern = "\." & docType & "\.xml$"
   
-  'Создание COM object EInvVatService.Connector
-  'set EVatService = CreateObject("EInvVatService.Connector")
-  'if read_timeout <> "" then
-  '   res = EVatService.SetServiceProperty( "connection.readTimeout", read_timeout, 0 )
-  '   if res <> 0 then
-  '     WScript.Echo "Ошибка установки таймаута сетевого чтения: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
-  '     WScript.Quit
-  '   end if    
-  'end if
+  Создание COM object EInvVatService.Connector
+  set EVatService = CreateObject("EInvVatService.Connector")
+  if read_timeout <> "" then
+     res = EVatService.SetServiceProperty( "connection.readTimeout", read_timeout, 0 )
+     if res <> 0 then
+       WScript.Echo "Ошибка установки таймаута сетевого чтения: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
+       WScript.Quit
+     end if    
+  end if
   
-  'compVersion = EVatService.Version
-  'WScript.Echo "Версия компонента EInvVatService " & compVersion  
+  compVersion = EVatService.Version
+  WScript.Echo "Версия компонента EInvVatService " & compVersion  
   
   'Создание COM object для чтения файлов
   Set oFSO = CreateObject("Scripting.FileSystemObject")
   
-  'res = EVatService.Login(connectStr, loginFlags)
-  'if res = 0 then
-  '   WScript.Echo "Авторизация успешна"
-  'else
-  '   WScript.Echo "Ошибка авторизации: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
-  '   WScript.Quit
-  'end if
+  res = EVatService.Login(connectStr, loginFlags)
+  if res = 0 then
+     WScript.Echo "Авторизация успешна"
+  else
+     WScript.Echo "Ошибка авторизации: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
+     WScript.Quit
+  end if
 
-  'if prxy_url <> "" and prxy_url <> "%PROXY_URL%" then
-  '   if EVatService.SetProxy(prxy_url, prxy_port, prxy_user, prxy_pass, prxy_type) <> 0 then
-  '      WScript.Echo "Ошибка установки прокси: " & EVatService.LastError
-  '      WScript.Quit
-  '   end if
-  '   prxy_msg = " через прокси " & prxy_url & ":" & prxy_port
-  'end if
+  if prxy_url <> "" and prxy_url <> "%PROXY_URL%" then
+     if EVatService.SetProxy(prxy_url, prxy_port, prxy_user, prxy_pass, prxy_type) <> 0 then
+        WScript.Echo "Ошибка установки прокси: " & EVatService.LastError
+        WScript.Quit
+     end if
+     prxy_msg = " через прокси " & prxy_url & ":" & prxy_port
+  end if
 
-  'WScript.Echo "Подключение   " & url & prxy_msg
-  'res = EVatService.Connect(url)
-  'if res = 0 then
-  '   WScript.Echo "Подключение успешно"
-  'else
-  '   WScript.Echo "Ошибка подключения: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
-  '   WScript.Quit
-  'end if 
+  WScript.Echo "Подключение   " & url & prxy_msg
+  res = EVatService.Connect(url)
+  if res = 0 then
+     WScript.Echo "Подключение успешно"
+  else
+     WScript.Echo "Ошибка подключения: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
+     WScript.Quit
+  end if 
   
   RefreshFolder FolderName, sgnPattern
-  'if EVatService.Disconnect <> 0 then
-  '   WScript.Echo "Ошибка при завершении подключения к службе регистрации"
-  'end if
+  if EVatService.Disconnect <> 0 then
+     WScript.Echo "Ошибка при завершении подключения к службе регистрации"
+  end if
   
-  'if EVatService.Logout <> 0 then
-  '   WScript.Echo "Ошибка при завершении авторизованной сессии"
-  'end if  
+  if EVatService.Logout <> 0 then
+     WScript.Echo "Ошибка при завершении авторизованной сессии"
+  end if  
   
   'конец программы
   
@@ -166,15 +166,14 @@
 			invoiceFileName = objFile
 					
 			cnt = cnt + 1
-			'set InvVatXml = EVatService.CreateEDoc
-			'res = InvVatXml.LoadFromFile(CStr(objFolder.Path & "\" & objFile))
-			'if res <> 0 then
-			'   WScript.Echo "Ошибка чтения файла: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
-			'else
+			set InvVatXml = EVatService.CreateEDoc
+			res = InvVatXml.LoadFromFile(CStr(objFolder.Path & "\" & objFile))
+			if res <> 0 then
+			   WScript.Echo "Ошибка чтения файла: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
+			else
 			
 				'invVatNumber = InvVatXml.Document.GetXmlNodeValue("issuance/general/number") 
 				
-				'lastStatus = FindLastStatusFor(invVatNumber, colFiles)
 				invVatNumber = Mid(invoiceFileName,9, 25)
         colfin = Filter(colstats, "invoice-" & invVatNumber)
         lastStatus = FindLastStatusFor(invVatNumber, colfin, objFolder)
@@ -226,7 +225,7 @@
 				end if
 				
 				if refresh = 1 then
-				'   RefreshInvStatus(invVatNumber)
+				  RefreshInvStatus(invVatNumber)
 				end if	
 
 			  if donemove = 1 then
@@ -237,7 +236,7 @@
         next
         MoveToDone coltomove, objFolder
         end if
-		  '	end if	
+		  end if	
 	Next	
 	
 	if cnt = 0 then
@@ -257,20 +256,18 @@
 	status = ""
 
 	For Each objFile in colFiles
-      
-		
-			'set StatusXml = EVatService.CreateEDoc
-			'if StatusXml.LoadFromFile(CStr(objFolder.Path & "\" & objFile)) <> 0 then
-				'WScript.Echo "Ошибка чтения файла " & fn & ": " & EVatService.LastError
-			'else
-				'dtStr = StatusXml.Document.GetXmlNodeValue("status_info/document_state/since") 
-				'if dtStr > onDate then
-					'onDate = dtStr
-					'status = StatusXml.Document.GetXmlNodeValue("status_info/document_state/status") 
+			set StatusXml = EVatService.CreateEDoc
+			if StatusXml.LoadFromFile(CStr(objFolder.Path & "\" & objFile)) <> 0 then
+				WScript.Echo "Ошибка чтения файла " & fn & ": " & EVatService.LastError
+			else
+				dtStr = StatusXml.Document.GetXmlNodeValue("status_info/document_state/since") 
+				if dtStr > onDate then
+					onDate = dtStr
+					status = StatusXml.Document.GetXmlNodeValue("status_info/document_state/status") 
 					status  = replace(Mid(objFile, 53, len(objFile)-56), ".text", "")
       					'WScript.Echo "статус: " & status
-				'end if   
-			'end if 
+				end if   
+			end if 
 	Next	
 	
 	FindLastStatusFor = status
@@ -278,45 +275,45 @@
   end function
   
   
-  'sub RefreshInvStatus(InvNumber)
-      'WScript.Echo "Получение статуса счета-фактуры с номером " & InvNumber & ": "
+  sub RefreshInvStatus(InvNumber)
+      WScript.Echo "Получение статуса счета-фактуры с номером " & InvNumber & ": "
   
-	  'set EDocStatusInfo = EVatService.GetStatus(InvNumber)  
-	  'if EDocStatusInfo is Nothing then
-	'	  WScript.Echo "Ошибка при получении статуса счета-фактуры с номером " & InvNumber & ": " + EVatService.LastError
+	  set EDocStatusInfo = EVatService.GetStatus(InvNumber)  
+	  if EDocStatusInfo is Nothing then
+		  WScript.Echo "Ошибка при получении статуса счета-фактуры с номером " & InvNumber & ": " + EVatService.LastError
 		  
-	'	  exit sub
-	'  else
-	'	  dt = FormatDate(Date)
+		  exit sub
+	  else
+		  dt = FormatDate(Date)
 
-	'	  res = EDocStatusInfo.Verify
-	'	  if res <> 0 then
-	'		 WScript.Echo "Ошибка проверки полученного документа: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
+		  res = EDocStatusInfo.Verify
+		  if res <> 0 then
+			 WScript.Echo "Ошибка проверки полученного документа: " & EVatService.LastError & " (    0x" & Hex(res) & ")"
 			 
-        '     fn = oFSO.BuildPath(FolderName, "invoice-" & InvNumber & "-status-" & dt & "-" & EDocStatusInfo.Status & ".error")
-        '  else
-	'	     WScript.Echo "Статус обработки ЭСЧФ: " + EDocStatusInfo.Status
-        '     WScript.Echo "Дополнительная информация: " + EDocStatusInfo.Message
-        '     WScript.Echo "Дата установки статуса ЭСЧФ: " + EDocStatusInfo.Since
+             fn = oFSO.BuildPath(FolderName, "invoice-" & InvNumber & "-status-" & dt & "-" & EDocStatusInfo.Status & ".error")
+          else
+		        WScript.Echo "Статус обработки ЭСЧФ: " + EDocStatusInfo.Status
+            WScript.Echo "Дополнительная информация: " + EDocStatusInfo.Message
+            WScript.Echo "Дата установки статуса ЭСЧФ: " + EDocStatusInfo.Since
 			  
-	'	     fn = oFSO.BuildPath(FolderName, "invoice-" & InvNumber & "-status-" & dt & "-" & EDocStatusInfo.Status)
-	'	  end if		  
+		     fn = oFSO.BuildPath(FolderName, "invoice-" & InvNumber & "-status-" & dt & "-" & EDocStatusInfo.Status)
+		  end if		  
 		  
-	'	  res = EDocStatusInfo.SaveToFile( fn & ".xml" )
-	'	  if res <> 0 then
-	'		 WScript.Echo "Ошибка сохранения полученного документа статуса: " & EVatService.LastError & " (Код 0x" & Hex(res) & ")"
-	'		 WScript.quit
-	'	  end if
+		  res = EDocStatusInfo.SaveToFile( fn & ".xml" )
+		  if res <> 0 then
+			 WScript.Echo "Ошибка сохранения полученного документа статуса: " & EVatService.LastError & " (Код 0x" & Hex(res) & ")"
+			 WScript.quit
+		  end if
           
-        '  res = EDocStatusInfo.Document.SaveToFile( fn & ".text.xml" )
-	'	  if res <> 0 then
-	'	     WScript.Echo "Ошибка сохранения текста статуса: " & EVatService.LastError & " (Код 0x" & Hex(res) & ")"
-	'	     WScript.quit
-	'	  end if          
+          res = EDocStatusInfo.Document.SaveToFile( fn & ".text.xml" )
+		  if res <> 0 then
+		     WScript.Echo "Ошибка сохранения текста статуса: " & EVatService.LastError & " (Код 0x" & Hex(res) & ")"
+		     WScript.quit
+		  end if          
 		
-	'	  WScript.Echo "Файл информации о статусе " & fn & ".xml" & " сохранен"	  
-	'  end if
-  'end sub
+		  WScript.Echo "Файл информации о статусе " & fn & ".xml" & " сохранен"	  
+	  end if
+  end sub
     
 
  Function FormatDate(myDate)
